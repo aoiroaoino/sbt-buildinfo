@@ -34,7 +34,7 @@ private[sbtbuildinfo] case class ScalaClassRenderer(options: Seq[BuildInfoOption
 
     List(
       s"  /** The value is ${quote(value)}. */",
-      s"  val $identifier$typeDecl = ${quote(value)}"
+      s"  final val $identifier$typeDecl = ${quote(value)}"
     )
   }
 
@@ -53,14 +53,14 @@ private[sbtbuildinfo] case class ScalaClassRenderer(options: Seq[BuildInfoOption
     if (options.contains(BuildInfoOption.ToMap) || options.contains(BuildInfoOption.ToJson))
       results
         .map(result => "    \"%s\" -> %s".format(result.identifier, result.identifier))
-        .mkString("  val toMap: Map[String, Any] = Map[String, Any](\n", ",\n", ")")
+        .mkString("  final val toMap: Map[String, Any] = Map[String, Any](\n", ",\n", ")")
         .split("\n")
         .toList ::: List("")
     else Nil
 
   def toJsonLine: Seq[String] =
     if (options contains BuildInfoOption.ToJson)
-      List("""  val toJson: String = toMap.map(i => "\"" + i._1 + "\":\"" + i._2 + "\"").mkString("{", ", ", "}")""")
+      List("""  final val toJson: String = toMap.map(i => "\"" + i._1 + "\":\"" + i._2 + "\"").mkString("{", ", ", "}")""")
     else Nil
 
   private def getType(typeExpr: TypeExpression): Option[String] = {
